@@ -6,11 +6,11 @@
 #    By: samatsum <samatsum@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2025/01/04 21:01:21 by samatsum          #+#    #+#              #
-#    Updated: 2025/03/29 23:18:08 by samatsum         ###   ########.fr        #
+#    Updated: 2025/03/29 23:31:59 by samatsum         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
-NAME = philo
+NAME = philo_bonus
 CC = cc
 RM = rm -rf
 CFLAGS = -Wall -Wextra -Werror
@@ -50,7 +50,9 @@ fclean: clean
 
 re: fclean all
 
-.PHONY: all clean fclean re
+bonus: all
+
+.PHONY: all clean fclean re bonus
 
 # //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 # 時   0          1          2          3          4          5          6          7          8          9         10          11          12//

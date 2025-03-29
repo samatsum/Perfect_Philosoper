@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   utils_02.c                                         :+:      :+:    :+:   */
+/*   utils_02_bonus.c                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: samatsum <samatsum@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/21 21:11:34 by samatsum          #+#    #+#             */
-/*   Updated: 2025/03/29 23:16:00 by samatsum         ###   ########.fr       */
+/*   Updated: 2025/03/29 23:26:42 by samatsum         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,8 +41,8 @@ void	print_death_msg(t_data *data, int id)
 {
 	size_t	time;
 
-	pthread_mutex_lock(&data->mutex_print);
+	sem_wait(data->print_sem);
 	time = get_time() - data->simulation_start_time;
 	printf("%lu %d died\n", time, id);
-	pthread_mutex_unlock(&data->mutex_print);
+	sem_post(data->print_sem);
 }
