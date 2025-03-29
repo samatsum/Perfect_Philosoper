@@ -6,7 +6,7 @@
 /*   By: samatsum <samatsum@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/12/21 21:33:22 by samatsum          #+#    #+#             */
-/*   Updated: 2025/01/19 14:06:49 by samatsum         ###   ########.fr       */
+/*   Updated: 2025/03/30 01:25:15 by samatsum         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,6 +15,7 @@
 int			main(int argc, char **argv);
 static int	philosophers(int argc, char **argv);
 static void	print_instruction(void);
+static int	monitor_meals(t_data *data);
 
 int	main(int argc, char **argv)
 {
@@ -35,12 +36,53 @@ static int	philosophers(int argc, char **argv)
 
 	if (init_data(&data, argc, argv) == MALLOC_ERROR)
 		return (MALLOC_ERROR);
-	init_forks(&data);
+	
+	if (init_semaphores(&data) == FAIL)
+	{
+		free_data(&data);
+		return (FAIL);
+	}
+	
 	init_philos(&data);
-	run_threads(&data);
-	join_threads(&data);
+	
+	if (run_processes(&data) == FAIL)
+	{
+		cleanup_semaphores(&data);
+		free_data(&data);
+		return (FAIL);
+	}
+	
+	/* 親プロセスで食事完了監視を行う */
+	if (data.nb_must_meals > 0)
+		monitor_meals(&data);
+	
+	/* 全プロセスの終了を待つ */
+	wait_processes(&data);
+	
+	/* 後片付け */
+	cleanup_semaphores(&data);
 	free_data(&data);
+	
 	return (ALL_OK);
+}
+
+/* ************************************************************************** */
+static int	monitor_meals(t_data *data)
+{
+	int	i;
+	
+	/* 各哲学者からの食事完了通知を待つ */
+	for (i = 0; i < data->nb_philos; i++)
+		sem_wait(data->meals_sem);
+	
+	/* すべての哲学者が食事を完了 - シミュレーション終了 */
+	for (i = 0; i < data->nb_philos; i++)
+		kill(data->philo_pids[i], SIGTERM);
+	
+	/* 監視プロセスも終了 */
+	kill(data->monitor_pid, SIGTERM);
+	
+	return (SUCCESS);
 }
 
 /* ************************************************************************** */

@@ -6,105 +6,73 @@
 /*   By: samatsum <samatsum@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/12/23 18:12:54 by samatsum          #+#    #+#             */
-/*   Updated: 2025/01/19 14:25:29 by samatsum         ###   ########.fr       */
+/*   Updated: 2025/03/30 01:10:52 by samatsum         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../include/philo.h"
 
-void		*all_full_monitor_routine(void *data_p);
-static bool	check_all_philos_full(t_data *data);
-void		*all_alive_monitor_routine(void *data_p);
-bool		time_over(t_philo *philo);
-static void	notify_all_philos(t_data *data);
-
-/* ************************************************************************** */
-// usleep(1000) for ALL philosophers sleeping
-void	*all_full_monitor_routine(void *data_p)
+// 死亡監視プロセス
+void *death_monitor(void *philo_p)
 {
-	t_data	*data;
-
-	data = (t_data *)data_p;
-	while (get_keep_iterating_flag(data))
+	t_philo *philo = (t_philo *)philo_p;
+	t_data *data = philo->data;
+	
+	while (1)
 	{
-		usleep(1000);
-		if (check_all_philos_full(data) == SUCCESS)
-			break ;
+		if ((get_time() - philo->last_eat_time) > data->die_time)
+		{
+			// 死亡メッセージを出力
+			sem_wait(data->print_sem);
+			printf("%lu %d died\n", get_time() - data->simulation_start_time, philo->id);
+			
+			// 死亡を通知
+			sem_post(data->dead_sem);
+			return (NULL);
+		}
+		usleep(1000);  // 少し待機してCPU負荷を下げる
 	}
-	if (get_keep_iterating_flag(data))
-	{
-		set_keep_iterating_flag(data, false);
-		notify_all_philos(data);
-	}
-	return (NULL);
 }
 
-/* ************************************************************************** */
-static bool	check_all_philos_full(t_data *data)
+// メイン監視プロセス
+int create_monitor_process(t_data *data)
 {
-	int	index;
-	int	full_flag;
-
-	index = -1;
-	full_flag = 1;
-	while (++index < data->nb_philos && get_keep_iterating_flag(data))
+	data->monitor_pid = fork();
+	
+	if (data->monitor_pid < 0)
+		return (FAIL);
+	else if (data->monitor_pid == 0)
 	{
-		full_flag *= (data->philos[index].nb_meals_ate >= data->nb_must_meals);
-		if (full_flag == 0)
-			return (FAIL);
+		// 子プロセス: 監視を担当
+		
+		// 死亡通知を待つ
+		sem_wait(data->dead_sem);
+		
+		// 死亡が検出された - すべての哲学者を終了させる
+		for (int i = 0; i < data->nb_philos; i++)
+			kill(data->philo_pids[i], SIGTERM);
+			
+		exit(0);
 	}
+	
 	return (SUCCESS);
 }
 
-/* ************************************************************************** */
-void	*all_alive_monitor_routine(void *data_p)
+// 食事完了監視
+int monitor_meals(t_data *data)
 {
-	int		index;
-	t_data	*data;
-	t_philo	*philos;
-
-	data = (t_data *)data_p;
-	philos = data->philos;
-	index = -1;
-	while (++index < data->nb_philos && get_keep_iterating_flag(data))
-	{
-		if (time_over(&philos[index]) && get_keep_iterating_flag(data))
-		{
-			set_keep_iterating_flag(data, false);
-			notify_all_philos(data);
-			print_death_msg(data, philos[index].id);
-			break ;
-		}
-		if (index == data->nb_philos - 1)
-			index = -1;
-	}
-	return (NULL);
-}
-
-/* ************************************************************************** */
-bool	time_over(t_philo *philo)
-{
-	bool		result;
-	t_data		*data;
-
-	data = philo->data;
-	result = false;
-	if ((get_time() - philo->last_eat_time) > data->die_time)
-	{
-		set_philo_status(philo, DEAD);
-		result = true;
-	}
-	return (result);
-}
-
-/* ************************************************************************** */
-static void	notify_all_philos(t_data *data)
-{
-	t_philo	*philos;
-	int		index;
-
-	philos = data->philos;
-	index = -1;
-	while (++index < data->nb_philos)
-		set_philo_status(&philos[index], DEAD);
+	if (data->nb_must_meals <= 0)
+		return (SUCCESS);  // 食事回数指定なし
+		
+	for (int i = 0; i < data->nb_philos; i++)
+		sem_wait(data->meals_sem);  // 各哲学者からの食事完了通知を待つ
+		
+	// すべての哲学者が食事を完了 - シミュレーション終了
+	for (int i = 0; i < data->nb_philos; i++)
+		kill(data->philo_pids[i], SIGTERM);
+		
+	// 監視プロセスも終了
+	kill(data->monitor_pid, SIGTERM);
+	
+	return (SUCCESS);
 }

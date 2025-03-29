@@ -6,7 +6,7 @@
 /*   By: samatsum <samatsum@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/21 21:11:34 by samatsum          #+#    #+#             */
-/*   Updated: 2025/01/19 12:45:01 by samatsum         ###   ########.fr       */
+/*   Updated: 2025/03/30 01:27:25 by samatsum         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,6 +17,7 @@ size_t	get_time(void);
 void	print_death_msg(t_data *data, int id);
 
 /* ************************************************************************** */
+/* 時間関連の関数はほぼそのまま使用可能 */
 void	ft_usleep(size_t sleep_time)
 {
 	size_t	start;
@@ -37,12 +38,17 @@ size_t	get_time(void)
 }
 
 /* ************************************************************************** */
+/* 死亡メッセージ表示関数はミューテックスからセマフォに変更 */
 void	print_death_msg(t_data *data, int id)
 {
 	size_t	time;
 
-	pthread_mutex_lock(&data->mutex_print);
+	/* ミューテックスをセマフォに変更 */
+	sem_wait(data->print_sem);
 	time = get_time() - data->simulation_start_time;
 	printf("%lu %d died\n", time, id);
-	pthread_mutex_unlock(&data->mutex_print);
+	sem_post(data->print_sem);
+	
+	/* 死亡フラグも更新 */
+	set_simulation_running(data, false);
 }

@@ -6,7 +6,7 @@
 /*   By: samatsum <samatsum@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/25 11:46:56 by samatsum          #+#    #+#             */
-/*   Updated: 2025/01/19 14:27:07 by samatsum         ###   ########.fr       */
+/*   Updated: 2025/03/30 01:57:50 by samatsum         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,25 +14,14 @@
 
 void	free_data(t_data *data);
 void	print_msg(t_data *data, int id, char *msg);
-bool	get_keep_iterating_flag(t_data *data);
-void	set_keep_iterating_flag(t_data *data, bool set_to);
-void	set_philo_status(t_philo *philo, enum e_status status);
+bool	get_simulation_running(t_data *data);
+void	set_simulation_running(t_data *data, bool set_to);
 
 /* ************************************************************************** */
 void	free_data(t_data *data)
 {
-	int	index;
-
-	index = -1;
-	while (++index < data->nb_philos)
-	{
-		pthread_mutex_destroy(&data->forks[index]);
-	}
-	pthread_mutex_destroy(&data->mutex_print);
-	pthread_mutex_destroy(&data->mutex_keep_iter);
-	free(data->philo_ths);
+	free(data->philo_pids);
 	free(data->philos);
-	free(data->forks);
 }
 
 /* ************************************************************************** */
@@ -40,35 +29,31 @@ void	print_msg(t_data *data, int id, char *msg)
 {
 	size_t	time;
 
-	pthread_mutex_lock(&data->mutex_print);
+	sem_wait(data->print_sem);
 	time = get_time() - data->simulation_start_time;
-	if (get_keep_iterating_flag(data))
+	if (get_simulation_running(data))
 		printf("%lu %d %s\n", time, id, msg);
-	pthread_mutex_unlock(&data->mutex_print);
+	sem_post(data->print_sem);
 }
 
 /* ************************************************************************** */
-bool	get_keep_iterating_flag(t_data *data)
+bool	get_simulation_running(t_data *data)
 {
-	bool	iterating_flag;
+	bool	running;
 
-	pthread_mutex_lock(&data->mutex_keep_iter);
-	iterating_flag = data->keep_iterating_flag;
-	pthread_mutex_unlock(&data->mutex_keep_iter);
-	return (iterating_flag);
+	sem_wait(data->data_sem);
+	running = data->keep_iterating_flag;
+	sem_post(data->data_sem);
+	
+	return (running);
 }
 
 /* ************************************************************************** */
-void	set_keep_iterating_flag(t_data *data, bool new_flag)
+void	set_simulation_running(t_data *data, bool status)
 {
-	pthread_mutex_lock(&data->mutex_keep_iter);
-	data->keep_iterating_flag = new_flag;
-	pthread_mutex_unlock(&data->mutex_keep_iter);
+	sem_wait(data->data_sem);
+	data->keep_iterating_flag = status;
+	sem_post(data->data_sem);
 }
 
-/* ************************************************************************** */
-void	set_philo_status(t_philo *philo, enum e_status new_status)
-{
-	if (philo->status != DEAD)
-		philo->status = new_status;
-}
+/* Remove the print_death_msg function from here - it's already in utils_02.c */
