@@ -10,8 +10,8 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef PHILO_BONUS_H
-# define PHILO_BONUS_H
+#ifndef PHILO_H
+# define PHILO_H
 
 # include <unistd.h>
 # include <pthread.h>
@@ -21,11 +21,6 @@
 # include <sys/time.h>
 # include <stdint.h>
 # include <stdbool.h>
-# include <signal.h>
-# include <sys/wait.h>
-# include <semaphore.h>
-# include <fcntl.h>
-# include <sys/stat.h>
 
 # define SUCCESS 0
 # define INPUT_OK 0
@@ -35,12 +30,6 @@
 # define ALL_OK 0
 # define WRONG_INPUT 1
 # define MALLOC_ERROR 2
-
-# define SEM_FORKS "/sem_forks"
-# define SEM_PRINT "/sem_print"
-# define SEM_DEAD "/sem_dead"
-# define SEM_MEALS "/sem_meals"
-# define SEM_PHILO_DEAD "/sem_philo_dead_"
 
 enum e_status
 {
@@ -58,11 +47,12 @@ typedef struct s_philo
 {
 	int				id;
 	int				nb_meals_ate;
-	pid_t			pid;
+	int				usleep_time;
 	t_data			*data;
 	enum e_status	status;
-	sem_t			*philo_dead_sem;
-	char			philo_dead_sem_name[30];
+	pthread_mutex_t	*left_f;
+	pthread_mutex_t	*right_f;
+	pthread_mutex_t	mutex_last_eat_time;
 	size_t			last_eat_time;
 }t_philo;
 
@@ -70,15 +60,19 @@ typedef struct s_data
 {
 	int				nb_philos;
 	int				nb_must_meals;
+	int				nb_odd_philos;
+	int				eat_interval_time;
 	bool			keep_iterating_flag;
 	size_t			eat_time;
 	size_t			die_time;
 	size_t			sleep_time;
 	size_t			simulation_start_time;
-	sem_t			*forks_sem;
-	sem_t			*print_sem;
-	sem_t			*dead_sem;
-	sem_t			*meals_sem;
+	pthread_mutex_t	mutex_print;
+	pthread_mutex_t	mutex_keep_iter;
+	pthread_t		monitor_all_alive;
+	pthread_t		monitor_all_full;
+	pthread_t		*philo_ths;
+	pthread_mutex_t	*forks;
 	t_philo			*philos;
 }t_data;
 
@@ -91,17 +85,19 @@ int			ft_eat(t_philo *philo);
 // init_data.c
 int			init_data(t_data *data, int argc, char **argv);
 int			init_philos(t_data *data);
-int			init_semaphores(t_data *data);
+int			init_forks(t_data *data);
 // monitor.c
-void		*death_monitor_routine(void *philo_p);
+void		*all_full_monitor_routine(void *data_p);
+void		*all_alive_monitor_routine(void *data_p);
 bool		time_over(t_philo *philo);
 // philo_main.c
 int			main(int argc, char **argv);
 // routine.c
-void		philo_routine(t_philo *philo);
-// processes.c
-int			create_processes(t_data *data);
-void		wait_for_processes(t_data *data);
+void		*routine(void *philo_p);
+void		*special_routine(void *philo_p);
+// threads.c
+int			run_threads(t_data *data);
+int			join_threads(t_data *data);
 // utils_02.c
 size_t		get_time(void);
 void		ft_usleep(size_t time);
@@ -109,10 +105,8 @@ void		print_death_msg(t_data *data, int id);
 // utils.c
 void		free_data(t_data *data);
 void		print_msg(t_data *data, int id, char *msg);
+bool		get_keep_iterating_flag(t_data *data);
+void		set_keep_iterating_flag(t_data *data, bool set_to);
 void		set_philo_status(t_philo *philo, enum e_status status);
-void		close_semaphores(t_data *data);
-char		*ft_itoa(int n);
-void		ft_strcat(char *dest, const char *src);
-void		ft_strcpy(char *dest, const char *src);
 
 #endif

@@ -6,11 +6,11 @@
 /*   By: samatsum <samatsum@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/15 18:57:35 by samatsum          #+#    #+#             */
-/*   Updated: 2025/03/29 23:16:37 by samatsum         ###   ########.fr       */
+/*   Updated: 2025/01/15 19:12:22 by samatsum         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../include/philo_bonus.h"
+#include "../include/philo.h"
 
 int	ft_atoi(char *str);
 

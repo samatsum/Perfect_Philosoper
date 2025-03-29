@@ -6,11 +6,11 @@
 /*   By: samatsum <samatsum@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/25 09:14:32 by samatsum          #+#    #+#             */
-/*   Updated: 2025/03/29 23:16:42 by samatsum         ###   ########.fr       */
+/*   Updated: 2025/01/19 14:04:03 by samatsum         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../include/philo_bonus.h"
+#include "../include/philo.h"
 
 int			check_input(int argc, char **argv);
 static int	wrong_input_check(int argc, char **argv);

@@ -6,11 +6,11 @@
 #    By: samatsum <samatsum@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2025/01/04 21:01:21 by samatsum          #+#    #+#              #
-#    Updated: 2025/03/29 23:31:59 by samatsum         ###   ########.fr        #
+#    Updated: 2025/01/19 14:51:59 by samatsum         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
-NAME = philo_bonus
+NAME = philo
 CC = cc
 RM = rm -rf
 CFLAGS = -Wall -Wextra -Werror
@@ -18,16 +18,16 @@ CFLAGS = -Wall -Wextra -Werror
 SRC_DIR = src/
 OBJ_DIR = objects/
 
-SRC =	check_input_bonus \
-		ft_atoi_bonus \
-		ft_eat_bonus \
-		init_data_bonus \
-		monitor_bonus \
-		philo_main_bonus \
-		processes_bonus \
-    	routine_bonus \
-    	utils_02_bonus \
-		utils_bonus \
+SRC =	check_input \
+		ft_atoi \
+		ft_eat \
+		init_data \
+		monitor \
+		philo_main \
+    	routine \
+		threads \
+    	utils_02 \
+		utils \
 
 SRCS = $(addprefix $(SRC_DIR), $(addsuffix .c, $(SRC)))
 
@@ -50,9 +50,7 @@ fclean: clean
 
 re: fclean all
 
-bonus: all
-
-.PHONY: all clean fclean re bonus
+.PHONY: all clean fclean re
 
 # //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 # 時   0          1          2          3          4          5          6          7          8          9         10          11          12//
