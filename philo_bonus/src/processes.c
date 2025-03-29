@@ -6,7 +6,7 @@
 /*   By: samatsum <samatsum@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/16 18:57:17 by samatsum          #+#    #+#             */
-/*   Updated: 2025/03/30 02:29:36 by samatsum         ###   ########.fr       */
+/*   Updated: 2025/03/30 03:43:26 by samatsum         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -78,26 +78,3 @@ int	wait_processes(t_data *data)
 	return (SUCCESS);
 }
 
-/* ************************************************************************** */
-int	create_monitor_process(t_data *data)
-{
-	data->monitor_pid = fork();
-	
-	if (data->monitor_pid < 0)
-		return (FAIL);
-	else if (data->monitor_pid == 0)
-	{
-		/* 子プロセス: 監視を担当 */
-		
-		/* 死亡通知を待つ */
-		sem_wait(data->dead_sem);
-		
-		/* 死亡が検出された - すべての哲学者を終了させる */
-		for (int i = 0; i < data->nb_philos; i++)
-			kill(data->philo_pids[i], SIGTERM);
-			
-		exit(0);
-	}
-	
-	return (SUCCESS);
-}
