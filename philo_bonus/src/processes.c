@@ -6,7 +6,7 @@
 /*   By: samatsum <samatsum@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/16 18:57:17 by samatsum          #+#    #+#             */
-/*   Updated: 2025/03/30 03:43:26 by samatsum         ###   ########.fr       */
+/*   Updated: 2025/03/30 03:54:45 by samatsum         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,17 +19,10 @@ int			wait_processes(t_data *data);
 /* ************************************************************************** */
 int	run_processes(t_data *data)
 {
+	data->simulation_start_time = get_time();
+	
 	if (create_philosopher_processes(data) == FAIL)
 		return (FAIL);
-	
-	/* 監視プロセスの作成 */
-	if (create_monitor_process(data) == FAIL)
-	{
-		/* エラー発生時、哲学者プロセスを終了 */
-		for (int i = 0; i < data->nb_philos; i++)
-			kill(data->philo_pids[i], SIGTERM);
-		return (FAIL);
-	}
 	
 	return (SUCCESS);
 }
@@ -38,20 +31,24 @@ int	run_processes(t_data *data)
 static int	create_philosopher_processes(t_data *data)
 {
 	int	index;
+	pid_t pid;
 
 	index = -1;
-	data->simulation_start_time = get_time();
-	
 	while (++index < data->nb_philos)
 	{
-		data->philo_pids[index] = fork();
-		if (data->philo_pids[index] < 0)
+		pid = fork();
+		if (pid < 0)
 			return (FAIL);
-		else if (data->philo_pids[index] == 0)
+		else if (pid == 0)
 		{
-			/* 子プロセス（哲学者）の処理 */
+			/* Child process (philosopher) */
 			philosopher_routine(&data->philos[index]);
-			exit(0); /* 子プロセスは処理完了後に終了する */
+			exit(0); /* Should never reach here due to exit in routine */
+		}
+		else
+		{
+			/* Parent process */
+			data->philo_pids[index] = pid;
 		}
 	}
 	
@@ -59,22 +56,25 @@ static int	create_philosopher_processes(t_data *data)
 }
 
 /* ************************************************************************** */
-/* ************************************************************************** */
 int	wait_processes(t_data *data)
 {
-	int	index;
 	int	status;
 	
-	/* 親プロセスは死亡監視プロセスの終了を待つ */
+	/* Wait for death monitor */
 	waitpid(data->monitor_pid, &status, 0);
 	
-	/* すべての哲学者プロセスを確実に終了 */
-	for (index = 0; index < data->nb_philos; index++)
+	/* Wait for meal monitor if it exists */
+	if (data->nb_must_meals > 0)
+		waitpid(data->meal_monitor_pid, &status, 0);
+	
+	/* Ensure all philosopher processes are terminated */
+	for (int i = 0; i < data->nb_philos; i++)
 	{
-		kill(data->philo_pids[index], SIGTERM); // 終了シグナルを送る
-		waitpid(data->philo_pids[index], &status, 0); // プロセスの終了を待つ
+		/* Send termination signal */
+		kill(data->philo_pids[i], SIGTERM);
+		/* Wait for process to exit */
+		waitpid(data->philo_pids[i], &status, 0);
 	}
 	
 	return (SUCCESS);
 }
-

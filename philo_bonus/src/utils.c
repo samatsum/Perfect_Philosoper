@@ -6,7 +6,7 @@
 /*   By: samatsum <samatsum@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/25 11:46:56 by samatsum          #+#    #+#             */
-/*   Updated: 2025/03/30 02:29:53 by samatsum         ###   ########.fr       */
+/*   Updated: 2025/03/30 03:54:54 by samatsum         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,14 +29,15 @@ void	print_msg(t_data *data, int id, char *msg)
 {
 	size_t	time;
 
+	if (!get_simulation_running(data))
+		return;
+		
 	sem_wait(data->print_sem);
 	time = get_time() - data->simulation_start_time;
-	if (get_simulation_running(data))
-		printf("%lu %d %s\n", time, id, msg);
+	printf("%lu %d %s\n", time, id, msg);
 	sem_post(data->print_sem);
 }
 
-/* ************************************************************************** */
 /* ************************************************************************** */
 bool	get_simulation_running(t_data *data)
 {
@@ -56,4 +57,3 @@ void	set_simulation_running(t_data *data, bool status)
 	data->keep_iterating_flag = status;
 	sem_post(data->data_sem);
 }
-/* Remove the print_death_msg function from here - it's already in utils_02.c */

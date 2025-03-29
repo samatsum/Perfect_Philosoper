@@ -6,7 +6,7 @@
 /*   By: samatsum <samatsum@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/12/24 13:15:12 by samatsum          #+#    #+#             */
-/*   Updated: 2025/03/30 03:41:16 by samatsum         ###   ########.fr       */
+/*   Updated: 2025/03/30 03:49:21 by samatsum         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,14 +21,14 @@ static int	malloc_data(t_data *data);
 /* ************************************************************************** */
 int	init_semaphores(t_data *data)
 {
-	/* 既存のセマフォを削除（前回の実行で残っている可能性があるため） */
+	/* Remove any existing semaphores */
 	sem_unlink(SEM_FORKS);
 	sem_unlink(SEM_PRINT);
 	sem_unlink(SEM_DEAD);
 	sem_unlink(SEM_MEALS);
 	sem_unlink(SEM_DATA);
 	
-	/* セマフォの作成 */
+	/* Create semaphores */
 	data->forks_sem = sem_open(SEM_FORKS, O_CREAT | O_EXCL, 0644, data->nb_philos);
 	data->print_sem = sem_open(SEM_PRINT, O_CREAT | O_EXCL, 0644, 1);
 	data->dead_sem = sem_open(SEM_DEAD, O_CREAT | O_EXCL, 0644, 0);
@@ -95,16 +95,17 @@ static int	malloc_data(t_data *data)
 }
 
 /* ************************************************************************** */
+/* ************************************************************************** */
 void	cleanup_semaphores(t_data *data)
 {
-	/* セマフォのクローズ */
+	/* Close semaphores */
 	sem_close(data->forks_sem);
 	sem_close(data->print_sem);
 	sem_close(data->dead_sem);
 	sem_close(data->meals_sem);
 	sem_close(data->data_sem);
 	
-	/* セマフォの削除 */
+	/* Unlink semaphores */
 	sem_unlink(SEM_FORKS);
 	sem_unlink(SEM_PRINT);
 	sem_unlink(SEM_DEAD);

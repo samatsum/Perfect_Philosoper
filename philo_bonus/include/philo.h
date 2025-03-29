@@ -88,7 +88,7 @@ typedef struct s_data
 	/* スレッドをプロセスに置き換え */
 	pid_t			*philo_pids;      /* 哲学者プロセスID配列 */
 	pid_t			monitor_pid;      /* 監視プロセスID */
-
+	pid_t			meal_monitor_pid; /* Added this field */
 	/* 削除：これらは不要になる
 	pthread_mutex_t	mutex_print;
 	pthread_mutex_t	mutex_keep_iter;
@@ -124,6 +124,7 @@ void		ft_usleep(size_t time);
 void		print_msg(t_data *data, int id, char *msg);
 void		print_death_msg(t_data *data, int id);
 void		free_data(t_data *data);
+int			create_monitor_processes(t_data *data);
 
 /* 以下の関数名を変更（内部実装もセマフォベースに変更） */
 bool		get_simulation_running(t_data *data);  /* get_keep_iterating_flag の代わり */

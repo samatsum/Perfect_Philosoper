@@ -6,7 +6,7 @@
 /*   By: samatsum <samatsum@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/26 21:09:44 by samatsum          #+#    #+#             */
-/*   Updated: 2025/03/30 03:40:50 by samatsum         ###   ########.fr       */
+/*   Updated: 2025/03/30 03:48:26 by samatsum         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,23 +20,23 @@ static int	ft_sleep(t_philo *philo);
 void	*philosopher_routine(void *philo_p)
 {
 	t_philo	*philo;
-	pthread_t death_monitor_tid;
+	pthread_t death_tid;
 
-	philo = (t_philo *) philo_p;
+	philo = (t_philo *)philo_p;
 	
-	/* 哲学者プロセス内で死亡監視スレッドを作成 */
-	if (pthread_create(&death_monitor_tid, NULL, &death_monitor, philo))
-		exit(1);
-	pthread_detach(death_monitor_tid);
-	
-	/* 最終食事時間を初期化 */
+	/* Initialize last_eat_time at start of simulation */
 	philo->last_eat_time = philo->data->simulation_start_time;
 	
-	/* 偶数番号の哲学者は少し遅らせる（デッドロック防止） */
+	/* Create death monitor thread */
+	if (pthread_create(&death_tid, NULL, &death_monitor, philo))
+		exit(1);
+	pthread_detach(death_tid);
+	
+	/* Add delay for even-numbered philosophers to avoid deadlock */
 	if (philo->id % 2 == 0)
 		ft_usleep(philo->data->eat_time / 2);
 	
-	/* メインループ */
+	/* Main lifecycle loop */
 	while (get_simulation_running(philo->data))
 	{
 		if (ft_eat(philo) == PHILO_DEATH)
@@ -55,20 +55,24 @@ void	*philosopher_routine(void *philo_p)
 			break;
 	}
 	
-	exit(0); /* 哲学者プロセスの終了 */
+	exit(0);
 }
 
 /* ************************************************************************** */
 static int	ft_think(t_philo *philo)
 {
-	print_msg(philo->data, philo->id, "is thinking");
+	if (get_simulation_running(philo->data))
+		print_msg(philo->data, philo->id, "is thinking");
 	return (SUCCESS);
 }
 
 /* ************************************************************************** */
 static int	ft_sleep(t_philo *philo)
 {
-	print_msg(philo->data, philo->id, "is sleeping");
-	ft_usleep(philo->data->sleep_time);
+	if (get_simulation_running(philo->data))
+	{
+		print_msg(philo->data, philo->id, "is sleeping");
+		ft_usleep(philo->data->sleep_time);
+	}
 	return (SUCCESS);
 }

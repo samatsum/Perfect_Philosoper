@@ -6,7 +6,7 @@
 /*   By: samatsum <samatsum@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/12/21 21:33:22 by samatsum          #+#    #+#             */
-/*   Updated: 2025/03/30 03:44:30 by samatsum         ###   ########.fr       */
+/*   Updated: 2025/03/30 03:54:24 by samatsum         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,6 +32,7 @@ int	main(int argc, char **argv)
 static int	philosophers(int argc, char **argv)
 {
 	t_data	data;
+	int		exit_status = ALL_OK;
 
 	if (init_data(&data, argc, argv) == MALLOC_ERROR)
 		return (MALLOC_ERROR);
@@ -51,10 +52,9 @@ static int	philosophers(int argc, char **argv)
 		return (FAIL);
 	}
 	
-	// 死亡監視プロセスの作成を追加
-	if (create_monitor_process(&data) == FAIL)
+	/* Create monitor processes */
+	if (create_monitor_processes(&data) == FAIL)
 	{
-		// エラー時の処理
 		for (int i = 0; i < data.nb_philos; i++)
 			kill(data.philo_pids[i], SIGTERM);
 		cleanup_semaphores(&data);
@@ -62,16 +62,15 @@ static int	philosophers(int argc, char **argv)
 		return (FAIL);
 	}
 	
-	// プロセスの終了を待つ
+	/* Wait for processes to complete */
 	wait_processes(&data);
 	
-	// 後片付け
+	/* Cleanup */
 	cleanup_semaphores(&data);
 	free_data(&data);
 	
-	return (ALL_OK);
+	return (exit_status);
 }
-
 /* ************************************************************************** */
 static void	print_instruction(void)
 {
