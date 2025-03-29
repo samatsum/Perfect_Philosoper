@@ -6,7 +6,7 @@
 /*   By: samatsum <samatsum@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/26 21:09:44 by samatsum          #+#    #+#             */
-/*   Updated: 2025/03/30 02:29:24 by samatsum         ###   ########.fr       */
+/*   Updated: 2025/03/30 03:40:50 by samatsum         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,9 +15,7 @@
 void		*philosopher_routine(void *philo_p);
 static int	ft_think(t_philo *philo);
 static int	ft_sleep(t_philo *philo);
-void		*death_monitor(void *philo_p);
 
-/* ************************************************************************** */
 /* ************************************************************************** */
 void	*philosopher_routine(void *philo_p)
 {
@@ -58,33 +56,6 @@ void	*philosopher_routine(void *philo_p)
 	}
 	
 	exit(0); /* 哲学者プロセスの終了 */
-}
-
-/* ************************************************************************** */
-void	*death_monitor(void *philo_p)
-{
-	t_philo	*philo;
-	t_data	*data;
-
-	philo = (t_philo *)philo_p;
-	data = philo->data;
-	
-	while (1)
-	{
-		/* 死亡条件のチェック */
-		if ((get_time() - philo->last_eat_time) > data->die_time)
-		{
-			/* 死亡メッセージを出力 */
-			print_death_msg(data, philo->id);
-			
-			/* 死亡を通知 */
-			sem_post(data->dead_sem);
-			break;
-		}
-		usleep(1000); /* 少し待機 */
-	}
-	
-	return (NULL);
 }
 
 /* ************************************************************************** */

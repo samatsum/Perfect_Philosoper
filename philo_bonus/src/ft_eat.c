@@ -6,7 +6,7 @@
 /*   By: samatsum <samatsum@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/12/21 13:12:31 by samatsum          #+#    #+#             */
-/*   Updated: 2025/03/30 01:24:49 by samatsum         ###   ########.fr       */
+/*   Updated: 2025/03/30 03:40:40 by samatsum         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,7 +42,7 @@ int	ft_eat(t_philo *philo)
 	philo->nb_meals_ate++;
 	
 	/* すべての食事を完了した場合、通知 */
-	if (data->nb_must_meals > 0 && philo->nb_meals_ate >= data->nb_must_meals)
+	if (data->nb_must_meals > 0 && philo->nb_meals_ate == data->nb_must_meals)
 		sem_post(data->meals_sem);
 	
 	/* フォークを戻す */

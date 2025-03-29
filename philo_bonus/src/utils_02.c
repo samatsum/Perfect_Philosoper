@@ -6,7 +6,7 @@
 /*   By: samatsum <samatsum@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/21 21:11:34 by samatsum          #+#    #+#             */
-/*   Updated: 2025/03/30 02:28:05 by samatsum         ###   ########.fr       */
+/*   Updated: 2025/03/30 03:41:02 by samatsum         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,7 +17,6 @@ size_t	get_time(void);
 void	print_death_msg(t_data *data, int id);
 
 /* ************************************************************************** */
-/* 時間関連の関数はほぼそのまま使用可能 */
 void	ft_usleep(size_t sleep_time)
 {
 	size_t	start;

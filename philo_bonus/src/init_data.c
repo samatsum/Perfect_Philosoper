@@ -6,7 +6,7 @@
 /*   By: samatsum <samatsum@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/12/24 13:15:12 by samatsum          #+#    #+#             */
-/*   Updated: 2025/03/30 01:23:28 by samatsum         ###   ########.fr       */
+/*   Updated: 2025/03/30 03:41:16 by samatsum         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,6 +17,7 @@ int			init_philos(t_data *data);
 int			init_data(t_data *data, int argc, char **argv);
 static int	malloc_data(t_data *data);
 
+/* ************************************************************************** */
 /* ************************************************************************** */
 int	init_semaphores(t_data *data)
 {
@@ -41,7 +42,6 @@ int	init_semaphores(t_data *data)
 		
 	return (SUCCESS);
 }
-
 /* ************************************************************************** */
 int	init_philos(t_data *data)
 {

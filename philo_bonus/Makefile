@@ -6,7 +6,7 @@
 #    By: samatsum <samatsum@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2025/01/04 21:01:21 by samatsum          #+#    #+#              #
-#    Updated: 2025/03/30 01:25:29 by samatsum         ###   ########.fr        #
+#    Updated: 2025/03/30 03:40:06 by samatsum         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -27,6 +27,7 @@ SRC =	check_input \
 		processes \
     	utils_02 \
 		utils \
+		monitor \
 
 SRCS = $(addprefix $(SRC_DIR), $(addsuffix .c, $(SRC)))
 
