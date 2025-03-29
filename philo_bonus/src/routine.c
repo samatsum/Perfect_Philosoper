@@ -6,7 +6,7 @@
 /*   By: samatsum <samatsum@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/26 21:09:44 by samatsum          #+#    #+#             */
-/*   Updated: 2025/03/30 01:24:32 by samatsum         ###   ########.fr       */
+/*   Updated: 2025/03/30 02:29:24 by samatsum         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,6 +17,7 @@ static int	ft_think(t_philo *philo);
 static int	ft_sleep(t_philo *philo);
 void		*death_monitor(void *philo_p);
 
+/* ************************************************************************** */
 /* ************************************************************************** */
 void	*philosopher_routine(void *philo_p)
 {
@@ -38,14 +39,20 @@ void	*philosopher_routine(void *philo_p)
 		ft_usleep(philo->data->eat_time / 2);
 	
 	/* メインループ */
-	while (1)
+	while (get_simulation_running(philo->data))
 	{
 		if (ft_eat(philo) == PHILO_DEATH)
 			break;
 		
+		if (!get_simulation_running(philo->data))
+			break;
+			
 		if (ft_sleep(philo) == PHILO_DEATH)
 			break;
 		
+		if (!get_simulation_running(philo->data))
+			break;
+			
 		if (ft_think(philo) == PHILO_DEATH)
 			break;
 	}

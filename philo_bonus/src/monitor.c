@@ -6,32 +6,33 @@
 /*   By: samatsum <samatsum@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/12/23 18:12:54 by samatsum          #+#    #+#             */
-/*   Updated: 2025/03/30 01:10:52 by samatsum         ###   ########.fr       */
+/*   Updated: 2025/03/30 02:28:51 by samatsum         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../include/philo.h"
 
-// 死亡監視プロセス
+// 死亡監視スレッド
 void *death_monitor(void *philo_p)
 {
 	t_philo *philo = (t_philo *)philo_p;
 	t_data *data = philo->data;
 	
-	while (1)
+	while (get_simulation_running(data))
 	{
+		// 死亡条件チェック
 		if ((get_time() - philo->last_eat_time) > data->die_time)
 		{
 			// 死亡メッセージを出力
-			sem_wait(data->print_sem);
-			printf("%lu %d died\n", get_time() - data->simulation_start_time, philo->id);
+			print_death_msg(data, philo->id);
 			
 			// 死亡を通知
 			sem_post(data->dead_sem);
-			return (NULL);
+			break;
 		}
 		usleep(1000);  // 少し待機してCPU負荷を下げる
 	}
+	return (NULL);
 }
 
 // メイン監視プロセス
@@ -52,6 +53,7 @@ int create_monitor_process(t_data *data)
 		for (int i = 0; i < data->nb_philos; i++)
 			kill(data->philo_pids[i], SIGTERM);
 			
+		// プログラムを正しく終了
 		exit(0);
 	}
 	
