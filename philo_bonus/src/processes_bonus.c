@@ -6,7 +6,7 @@
 /*   By: samatsum <samatsum@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/16 18:57:17 by samatsum          #+#    #+#             */
-/*   Updated: 2025/03/30 19:20:07 by samatsum         ###   ########.fr       */
+/*   Updated: 2025/03/30 20:08:31 by samatsum         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -56,19 +56,11 @@ int	wait_processes(t_data *main_data)
 	int	status;
 
 	waitpid(main_data->create_monitor_pid, &status, 0);
-	printf("End The Create_Monitor\n");
 	/* Wait for meal monitor if it exists */
 	if (main_data->nb_must_meals > 0)
-		waitpid(main_data->meal_monitor_pid, &status, 0);
-	printf("End The Meal_Monitor\n");
+		waitpid(main_data->meal_monitor_pid, &status, 0);//ここでずっと待ち続ける。
 	/* Ensure all philosopher processes are terminated */
 	for (int i = 0; i < main_data->nb_philos; i++)
-	{
-		// /* Send termination signal */
-		// kill(main_data->philo_pids[i], SIGTERM);
-		// /* Wait for process to exit */
 		waitpid(main_data->philo_pids[i], &status, 0);
-	}
-	printf("End The Wait_Process\n");
 	return (SUCCESS);
 }

@@ -6,7 +6,7 @@
 /*   By: samatsum <samatsum@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/31 12:15:12 by samatsum          #+#    #+#             */
-/*   Updated: 2025/03/30 19:42:17 by samatsum         ###   ########.fr       */
+/*   Updated: 2025/03/30 20:07:45 by samatsum         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,6 +31,8 @@ void	*death_monitor(void *philo_p)
 			set_simulation_running(p_data, false);
 			print_death_msg(p_data, philo->id);
 			sem_post(p_data->dead_sem);
+			for (int i = 0; i < p_data->nb_philos; i++)
+				sem_post(p_data->meals_sem);
 			exit(1);
 		}
 		// usleep(1000);
@@ -53,8 +55,6 @@ int	create_monitor_processes(t_data *main_data)
 		/* Terminate all philosophers */
 		for (int i = 0; i < main_data->nb_philos; i++)
 			kill(main_data->philo_pids[i], SIGTERM);
-		if (main_data->nb_must_meals > 0)
-			kill(main_data->meal_monitor_pid, SIGTERM);
 		exit(0);
 	}
 	/* Create meal monitor process if needed */
@@ -86,7 +86,6 @@ static void	monitor_meals(t_data *main_data)
 	while (completed_meals < main_data->nb_philos)
 	{
 		sem_wait(main_data->meals_sem);
-		printf("Monitor_Meals!!!!!!!!!!\n");
 		completed_meals++;
 	}
 	sem_post(main_data->dead_sem);

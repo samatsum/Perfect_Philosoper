@@ -6,7 +6,7 @@
 /*   By: samatsum <samatsum@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/26 21:09:44 by samatsum          #+#    #+#             */
-/*   Updated: 2025/03/30 19:42:52 by samatsum         ###   ########.fr       */
+/*   Updated: 2025/03/30 20:13:18 by samatsum         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -70,7 +70,7 @@ static int	ft_sleep(t_philo *philo)
 	sem_post(philo->philo_data->forks_sem);
 	sem_post(philo->philo_data->forks_sem);
 	if (get_simulation_running(philo->philo_data))
-		usleep(philo->philo_data->sleep_time);
+		usleep(philo->philo_data->sleep_time * 1000);
 	else
 		return (PHILO_DEATH);
 	return (SUCCESS);
