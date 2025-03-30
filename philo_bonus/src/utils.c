@@ -6,7 +6,7 @@
 /*   By: samatsum <samatsum@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/25 11:46:56 by samatsum          #+#    #+#             */
-/*   Updated: 2025/03/30 03:54:54 by samatsum         ###   ########.fr       */
+/*   Updated: 2025/03/30 12:28:15 by samatsum         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -46,7 +46,6 @@ bool	get_simulation_running(t_data *data)
 	sem_wait(data->data_sem);
 	running = data->keep_iterating_flag;
 	sem_post(data->data_sem);
-	
 	return (running);
 }
 

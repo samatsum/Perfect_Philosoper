@@ -6,7 +6,7 @@
 /*   By: samatsum <samatsum@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/12/21 13:12:31 by samatsum          #+#    #+#             */
-/*   Updated: 2025/03/30 03:54:10 by samatsum         ###   ########.fr       */
+/*   Updated: 2025/03/30 12:58:48 by samatsum         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,14 +41,7 @@ int	ft_eat(t_philo *philo)
 	/* Increment meal count and signal if needed */
 	philo->nb_meals_ate++;
 	if (data->nb_must_meals > 0 && philo->nb_meals_ate == data->nb_must_meals)
-	{
 		sem_post(data->meals_sem); /* Signal exactly once when threshold reached */
-	}
-	
-	/* Release forks */
-	sem_post(data->forks_sem);
-	sem_post(data->forks_sem);
-	
 	return (SUCCESS);
 }
 
@@ -56,18 +49,13 @@ int	ft_eat(t_philo *philo)
 static int	handle_only1_philo(t_philo *philo)
 {
 	t_data *data;
-	
 	data = philo->data;
-	
 	/* Take the only fork */
 	sem_wait(data->forks_sem);
 	print_msg(data, philo->id, "has taken a fork");
-	
 	/* Wait until death */
 	ft_usleep(data->die_time);
-	
 	/* Return fork */
 	sem_post(data->forks_sem);
-	
 	return (PHILO_DEATH);
 }
