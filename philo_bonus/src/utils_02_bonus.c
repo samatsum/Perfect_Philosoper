@@ -1,30 +1,19 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   utils_02.c                                         :+:      :+:    :+:   */
+/*   utils_02_bonus.c                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: samatsum <samatsum@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/21 21:11:34 by samatsum          #+#    #+#             */
-/*   Updated: 2025/03/30 17:01:39 by samatsum         ###   ########.fr       */
+/*   Updated: 2025/03/30 18:10:30 by samatsum         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../include/philo_bonus.h"
 
-void	ft_usleep(size_t sleep_time);
 size_t	get_time(void);
 void	print_death_msg(t_data *p_data, int id);
-
-/* ************************************************************************** */
-void	ft_usleep(size_t sleep_time)
-{
-	size_t	start;
-
-	start = get_time();
-	while ((get_time() - start) < sleep_time)
-		usleep(10);
-}
 
 /* ************************************************************************** */
 size_t	get_time(void)

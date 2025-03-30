@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   init_data.c                                        :+:      :+:    :+:   */
+/*   init_data_bonus.c                                  :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: samatsum <samatsum@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/12/24 13:15:12 by samatsum          #+#    #+#             */
-/*   Updated: 2025/03/30 17:01:39 by samatsum         ###   ########.fr       */
+/*   Updated: 2025/03/30 17:32:51 by samatsum         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,12 +22,14 @@ static int	malloc_data(t_data *main_data);
 int	init_semaphores(t_data *main_data)
 {
 	/* Remove any existing semaphores */
+	sem_unlink(SEM_START);
 	sem_unlink(SEM_FORKS);
 	sem_unlink(SEM_PRINT);
 	sem_unlink(SEM_DEAD);
 	sem_unlink(SEM_MEALS);
 	sem_unlink(SEM_DATA);
 	/* Create semaphores */
+	main_data->start_sem = sem_open(SEM_START, O_CREAT | O_EXCL, 0644, 0);
 	main_data->forks_sem = sem_open(SEM_FORKS, O_CREAT | O_EXCL, 0644, main_data->nb_philos);
 	main_data->print_sem = sem_open(SEM_PRINT, O_CREAT | O_EXCL, 0644, 1);
 	main_data->dead_sem = sem_open(SEM_DEAD, O_CREAT | O_EXCL, 0644, 0);
@@ -35,7 +37,7 @@ int	init_semaphores(t_data *main_data)
 	main_data->data_sem = sem_open(SEM_DATA, O_CREAT | O_EXCL, 0644, 1);
 	if (main_data->forks_sem == SEM_FAILED || main_data->print_sem == SEM_FAILED ||
 		main_data->dead_sem == SEM_FAILED || main_data->meals_sem == SEM_FAILED ||
-		main_data->data_sem == SEM_FAILED)
+		main_data->data_sem == SEM_FAILED || main_data->start_sem == SEM_FAILED)
 		return (FAIL);
 	return (SUCCESS);
 }
@@ -61,7 +63,6 @@ int	init_philos(t_data *main_data)
 /* ************************************************************************** */
 int	init_data(t_data *main_data, int argc, char **argv)
 {
-	main_data->simulation_start_time = 0;
 	main_data->keep_iterating_flag = true;
 	main_data->nb_philos = ft_atoi(argv[1]);
 	main_data->die_time = (size_t)ft_atoi(argv[2]);

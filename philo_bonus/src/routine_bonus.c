@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   routine.c                                          :+:      :+:    :+:   */
+/*   routine_bonus.c                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: samatsum <samatsum@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/26 21:09:44 by samatsum          #+#    #+#             */
-/*   Updated: 2025/03/30 17:01:39 by samatsum         ###   ########.fr       */
+/*   Updated: 2025/03/30 19:42:52 by samatsum         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,20 +19,20 @@ static int	ft_sleep(t_philo *philo);
 /* ************************************************************************** */
 void	*philosopher_routine(void *philo_p, t_data *main_data)
 {
-	t_philo	*philo;
-	pthread_t death_tid;
+	t_philo		*philo;
+	pthread_t	death_tid;
 
 	philo = (t_philo *)philo_p;
 
-	while(main_data->simulation_start_time == 0)
-		usleep(10);
+	philo->philo_data->simulation_start_time = main_data->simulation_start_time;
 	philo->last_eat_time = main_data->simulation_start_time;
+	philo->philo_data = main_data;
 	if (pthread_create(&death_tid, NULL, &death_monitor, philo))
 		exit(1);
 	pthread_detach(death_tid);
-	/* Add delay for even-numbered philosophers to avoid deadlock */
+	sem_wait(main_data->start_sem);
 	if (philo->id % 2 == 0)
-		ft_usleep(philo->philo_data->eat_time);
+		usleep(philo->philo_data->eat_time * 1000);
 	/* Main lifecycle loop */
 	while (get_simulation_running(philo->philo_data))
 	{
@@ -40,7 +40,6 @@ void	*philosopher_routine(void *philo_p, t_data *main_data)
 			break ;
 		if (!get_simulation_running(philo->philo_data))
 		{
-			/* Release forks */
 			sem_post(philo->philo_data->forks_sem);
 			sem_post(philo->philo_data->forks_sem);
 			break ;
@@ -71,7 +70,7 @@ static int	ft_sleep(t_philo *philo)
 	sem_post(philo->philo_data->forks_sem);
 	sem_post(philo->philo_data->forks_sem);
 	if (get_simulation_running(philo->philo_data))
-		ft_usleep(philo->philo_data->sleep_time);
+		usleep(philo->philo_data->sleep_time);
 	else
 		return (PHILO_DEATH);
 	return (SUCCESS);

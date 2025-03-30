@@ -37,6 +37,7 @@
 # define MALLOC_ERROR 2
 
 /* セマフォ名の定義 */
+# define SEM_START "/philo_start"
 # define SEM_FORKS "/philo_forks"
 # define SEM_PRINT "/philo_print"
 # define SEM_DEAD "/philo_dead"
@@ -78,6 +79,8 @@ typedef struct s_data
 	size_t			sleep_time;
 	size_t			simulation_start_time;
 
+
+	sem_t			*start_sem;
 	/* 以下のミューテックスをセマフォに置き換え */
 	sem_t			*forks_sem;       /* 利用可能なフォークの数 */
 	sem_t			*print_sem;       /* 出力保護用 */
@@ -87,7 +90,7 @@ typedef struct s_data
 
 	/* スレッドをプロセスに置き換え */
 	pid_t			*philo_pids;      /* 哲学者プロセスID配列 */
-	pid_t			monitor_pid;      /* 監視プロセスID */
+	pid_t			create_monitor_pid;
 	pid_t			meal_monitor_pid; /* Added this field */
 	/* 削除：これらは不要になる
 	pthread_mutex_t	mutex_print;
@@ -120,7 +123,6 @@ void		*death_monitor(void *philo_p);
 
 /* 既存のユーティリティ関数は維持 */
 size_t		get_time(void);
-void		ft_usleep(size_t time);
 void		print_msg(t_data *data, int id, char *msg);
 void		print_death_msg(t_data *data, int id);
 void		free_data(t_data *data);

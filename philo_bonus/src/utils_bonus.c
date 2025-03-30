@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   utils.c                                            :+:      :+:    :+:   */
+/*   utils_bonus.c                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: samatsum <samatsum@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/25 11:46:56 by samatsum          #+#    #+#             */
-/*   Updated: 2025/03/30 17:01:39 by samatsum         ###   ########.fr       */
+/*   Updated: 2025/03/30 18:52:19 by samatsum         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,8 +29,6 @@ void	print_msg(t_data *p_data, int id, char *msg)
 {
 	size_t	time;
 
-	if (!get_simulation_running(p_data))
-		return ;
 	sem_wait(p_data->print_sem);
 	time = get_time() - p_data->simulation_start_time;
 	printf("%lu %d %s\n", time, id, msg);
@@ -42,16 +40,12 @@ bool	get_simulation_running(t_data *p_data)
 {
 	bool	running;
 
-	sem_wait(p_data->data_sem);
 	running = p_data->keep_iterating_flag;
-	sem_post(p_data->data_sem);
 	return (running);
 }
 
 /* ************************************************************************** */
 void	set_simulation_running(t_data *p_data, bool status)
 {
-	sem_wait(p_data->data_sem);
 	p_data->keep_iterating_flag = status;
-	sem_post(p_data->data_sem);
 }
