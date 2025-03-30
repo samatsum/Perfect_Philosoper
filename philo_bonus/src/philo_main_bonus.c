@@ -6,11 +6,11 @@
 /*   By: samatsum <samatsum@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/12/21 21:33:22 by samatsum          #+#    #+#             */
-/*   Updated: 2025/03/30 03:54:24 by samatsum         ###   ########.fr       */
+/*   Updated: 2025/03/30 17:01:39 by samatsum         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../include/philo.h"
+#include "../include/philo_bonus.h"
 
 int			main(int argc, char **argv);
 static int	philosophers(int argc, char **argv);
@@ -31,45 +31,37 @@ int	main(int argc, char **argv)
 /* ************************************************************************** */
 static int	philosophers(int argc, char **argv)
 {
-	t_data	data;
-	int		exit_status = ALL_OK;
+	t_data	main_data;
 
-	if (init_data(&data, argc, argv) == MALLOC_ERROR)
+	if (init_data(&main_data, argc, argv) == MALLOC_ERROR)
 		return (MALLOC_ERROR);
-	
-	if (init_semaphores(&data) == FAIL)
+	if (init_semaphores(&main_data) == FAIL)
 	{
-		free_data(&data);
+		free_data(&main_data);
 		return (FAIL);
 	}
-	
-	init_philos(&data);
-	
-	if (run_processes(&data) == FAIL)
+	init_philos(&main_data);
+	if (run_processes(&main_data) == FAIL)
 	{
-		cleanup_semaphores(&data);
-		free_data(&data);
+		cleanup_semaphores(&main_data);
+		free_data(&main_data);
 		return (FAIL);
 	}
-	
 	/* Create monitor processes */
-	if (create_monitor_processes(&data) == FAIL)
+	if (create_monitor_processes(&main_data) == FAIL)
 	{
-		for (int i = 0; i < data.nb_philos; i++)
-			kill(data.philo_pids[i], SIGTERM);
-		cleanup_semaphores(&data);
-		free_data(&data);
+		for (int i = 0; i < main_data.nb_philos; i++)
+			kill(main_data.philo_pids[i], SIGTERM);
+		cleanup_semaphores(&main_data);
+		free_data(&main_data);
 		return (FAIL);
 	}
-	
 	/* Wait for processes to complete */
-	wait_processes(&data);
-	
+	wait_processes(&main_data);
 	/* Cleanup */
-	cleanup_semaphores(&data);
-	free_data(&data);
-	
-	return (exit_status);
+	cleanup_semaphores(&main_data);
+	free_data(&main_data);
+	return (0);
 }
 /* ************************************************************************** */
 static void	print_instruction(void)

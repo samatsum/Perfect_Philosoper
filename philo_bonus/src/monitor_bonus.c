@@ -6,35 +6,32 @@
 /*   By: samatsum <samatsum@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/03/31 12:15:12 by samatsum          #+#    #+#             */
-/*   Updated: 2025/03/30 03:53:17 by samatsum         ###   ########.fr       */
+/*   Updated: 2025/03/30 17:01:39 by samatsum         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../include/philo.h"
+#include "../include/philo_bonus.h"
 
 void *death_monitor(void *philo_p);
-int create_monitor_processes(t_data *data);
-static void monitor_meals(t_data *data);
+int create_monitor_processes(t_data *main_data);
+static void monitor_meals(t_data *main_data);
 
 /* ************************************************************************** */
 /* Death monitoring thread within each philosopher process */
-void *death_monitor(void *philo_p)
+void	*death_monitor(void *philo_p)
 {
-	t_philo *philo = (t_philo *)philo_p;
-	t_data *data = philo->data;
-	
-	while (get_simulation_running(data))
+	t_philo	*philo = (t_philo *)philo_p;
+	t_data	*p_data = philo->philo_data;
+
+	while (get_simulation_running(p_data))
 	{
 		/* Check death condition */
-		if ((get_time() - philo->last_eat_time) > data->die_time)
+		if ((get_time() - philo->last_eat_time) > p_data->die_time)
 		{
-			sem_wait(data->print_sem);
-			printf("%lu %d died\n", get_time() - data->simulation_start_time, philo->id);
-			sem_post(data->print_sem);
-			
-			/* Signal death */
-			sem_post(data->dead_sem);
-			exit(1); /* Exit immediately */
+			set_simulation_running(p_data, false);
+			print_death_msg(p_data, philo->id);
+			sem_post(p_data->dead_sem);
+			exit(1);
 		}
 		usleep(1000);
 	}
@@ -43,73 +40,56 @@ void *death_monitor(void *philo_p)
 
 /* ************************************************************************** */
 /* Create separate processes for monitoring death and meal completion */
-int create_monitor_processes(t_data *data)
+int	create_monitor_processes(t_data *main_data)
 {
 	/* Create death monitor process */
-	data->monitor_pid = fork();
-	if (data->monitor_pid < 0)
+	main_data->monitor_pid = fork();
+	if (main_data->monitor_pid < 0)
 		return (FAIL);
-	else if (data->monitor_pid == 0)
+	else if (main_data->monitor_pid == 0)
 	{
 		/* Death monitor process */
-		sem_wait(data->dead_sem); /* Wait for death signal */
-		
+		sem_wait(main_data->dead_sem); /* Wait for death signal */
 		/* Terminate all philosophers */
-		set_simulation_running(data, false);
-		for (int i = 0; i < data->nb_philos; i++)
-			kill(data->philo_pids[i], SIGTERM);
-		
+		set_simulation_running(main_data, false);
+		for (int i = 0; i < main_data->nb_philos; i++)
+			kill(main_data->philo_pids[i], SIGTERM);
 		exit(0);
 	}
-	
 	/* Create meal monitor process if needed */
-	if (data->nb_must_meals > 0)
+	if (main_data->nb_must_meals > 0)
 	{
-		data->meal_monitor_pid = fork();
-		if (data->meal_monitor_pid < 0)
+		main_data->meal_monitor_pid = fork();
+		if (main_data->meal_monitor_pid < 0)
 		{
-			kill(data->monitor_pid, SIGTERM);
+			kill(main_data->monitor_pid, SIGTERM);
 			return (FAIL);
 		}
-		else if (data->meal_monitor_pid == 0)
+		else if (main_data->meal_monitor_pid == 0)
 		{
 			/* Meal monitor process */
-			monitor_meals(data);
+			monitor_meals(main_data);
 			exit(0); /* Should never reach here */
 		}
 	}
-	
 	return (SUCCESS);
 }
 
 /* ************************************************************************** */
 /* Monitor meal completion - runs in its own process */
-static void monitor_meals(t_data *data)
+static void monitor_meals(t_data *main_data)
 {
 	int completed_meals = 0;
 	
 	/* Wait for meal completion signals from all philosophers */
-	while (completed_meals < data->nb_philos)
+	while (completed_meals < main_data->nb_philos)
 	{
-		sem_wait(data->meals_sem);
+		sem_wait(main_data->meals_sem);
 		completed_meals++;
 	}
-	
-	/* All philosophers have completed their meals */
-	sem_wait(data->print_sem);
+	sem_post(main_data->dead_sem); /* Use death signal to trigger termination */
+	sem_wait(main_data->print_sem);
 	printf("All philosophers have eaten at least %d times. Simulation completed.\n", 
-		data->nb_must_meals);
-	sem_post(data->print_sem);
-	
-	/* Signal termination */
-	set_simulation_running(data, false);
-	sem_post(data->dead_sem); /* Use death signal to trigger termination */
-	
-	/* Terminate all philosophers */
-	for (int i = 0; i < data->nb_philos; i++)
-		kill(data->philo_pids[i], SIGTERM);
-	
-	/* Also terminate the death monitor */
-	kill(data->monitor_pid, SIGTERM);
-	exit(0);
+		main_data->nb_must_meals);
+	sem_post(main_data->print_sem);
 }

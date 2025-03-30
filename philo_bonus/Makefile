@@ -6,7 +6,7 @@
 #    By: samatsum <samatsum@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2025/01/04 21:01:21 by samatsum          #+#    #+#              #
-#    Updated: 2025/03/30 03:40:06 by samatsum         ###   ########.fr        #
+#    Updated: 2025/03/30 17:03:01 by samatsum         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -18,16 +18,16 @@ CFLAGS = -Wall -Wextra -Werror
 SRC_DIR = src/
 OBJ_DIR = objects/
 
-SRC =	check_input \
-		ft_atoi \
-		ft_eat \
-		init_data \
-		philo_main \
-    	routine \
-		processes \
-    	utils_02 \
-		utils \
-		monitor \
+SRC =	check_input_bonus \
+		ft_atoi_bonus \
+		ft_eat_bonus \
+		init_data_bonus \
+		philo_main_bonus \
+    	routine_bonus \
+		processes_bonus \
+    	utils_02_bonus \
+		utils_bonus \
+		monitor_bonus \
 
 SRCS = $(addprefix $(SRC_DIR), $(addsuffix .c, $(SRC)))
 

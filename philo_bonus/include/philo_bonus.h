@@ -10,8 +10,8 @@
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef PHILO_H
-# define PHILO_H
+#ifndef PHILO_BONUS_H
+# define PHILO_BONUS_H
 
 # include <unistd.h>
 # include <pthread.h>
@@ -59,7 +59,7 @@ typedef struct s_philo
 {
 	int				id;
 	int				nb_meals_ate;
-	t_data			*data;
+	t_data			*philo_data;
 	enum e_status	status;
 	size_t			last_eat_time;
 	/* 以下の行を削除（フォークは中央で管理するためポインタ不要）
@@ -109,7 +109,7 @@ int			init_philos(t_data *data);
 
 /* 以下の関数宣言を変更 */
 int			init_semaphores(t_data *data);  /* init_forks の代わり */
-void		*philosopher_routine(void *philo_p);  /* routine の代わり */
+void		*philosopher_routine(void *philo_p, t_data *data);  /* routine の代わり */
 int			run_processes(t_data *data);  /* run_threads の代わり */
 int			wait_processes(t_data *data);  /* join_threads の代わり */
 void		cleanup_semaphores(t_data *data);  /* 新規追加 */
