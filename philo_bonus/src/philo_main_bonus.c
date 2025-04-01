@@ -6,7 +6,7 @@
 /*   By: samatsum <samatsum@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/12/21 21:33:22 by samatsum          #+#    #+#             */
-/*   Updated: 2025/03/30 19:14:53 by samatsum         ###   ########.fr       */
+/*   Updated: 2025/04/02 02:50:10 by samatsum         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -56,6 +56,8 @@ static int	philosophers(int argc, char **argv)
 		free_data(&main_data);
 		return (FAIL);
 	}
+	for (int i = 0; i < main_data.nb_philos; i++)
+		sem_post(main_data.start_sem);
 	/* Wait for processes to complete */
 	wait_processes(&main_data);
 	/* Cleanup */
@@ -71,7 +73,7 @@ static void	print_instruction(void)
 	printf("time_to_eat time_to_sleep ");
 	printf("number_of_times_each_philosopher_must_eat (optional argument)\n");
 	printf("Example:\n\n");
-	printf("./philo 4 800 200 200 5\n\n");
+	printf("./philo_bonus 4 800 200 200 5\n\n");
 	printf("nb_philos: +1~\n");
 	printf("time_to_die: +11~\n");
 	printf("time_to_eat: +11~\n");

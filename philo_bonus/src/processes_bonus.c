@@ -6,7 +6,7 @@
 /*   By: samatsum <samatsum@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/01/16 18:57:17 by samatsum          #+#    #+#             */
-/*   Updated: 2025/03/30 20:08:31 by samatsum         ###   ########.fr       */
+/*   Updated: 2025/04/02 02:49:14 by samatsum         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,8 +45,6 @@ static int	create_philosopher_processes(t_data *main_data)
 		else
 			main_data->philo_pids[index] = pid;
 	}
-	for (int i = 0; i < main_data->nb_philos; i++)
-		sem_post(main_data->start_sem);
 	return (SUCCESS);
 }
 

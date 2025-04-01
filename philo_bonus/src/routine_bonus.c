@@ -6,7 +6,7 @@
 /*   By: samatsum <samatsum@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/26 21:09:44 by samatsum          #+#    #+#             */
-/*   Updated: 2025/03/30 20:13:18 by samatsum         ###   ########.fr       */
+/*   Updated: 2025/04/02 02:52:15 by samatsum         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,12 +27,12 @@ void	*philosopher_routine(void *philo_p, t_data *main_data)
 	philo->philo_data->simulation_start_time = main_data->simulation_start_time;
 	philo->last_eat_time = main_data->simulation_start_time;
 	philo->philo_data = main_data;
+	sem_wait(main_data->start_sem);
 	if (pthread_create(&death_tid, NULL, &death_monitor, philo))
 		exit(1);
 	pthread_detach(death_tid);
-	sem_wait(main_data->start_sem);
 	if (philo->id % 2 == 0)
-		usleep(philo->philo_data->eat_time * 1000);
+		usleep(philo->philo_data->eat_time * 500);
 	/* Main lifecycle loop */
 	while (get_simulation_running(philo->philo_data))
 	{
